@@ -2,14 +2,14 @@
 :Author:    Oliver Eikemeier
 :Email:     <eikemeier@fillmore-labs.com>
 :Date:      2021-11
-:Revision:  v0.1
+:Revision:  v0.2
 :toc: macro
 
 toc::[]
 
 == Abstract
 
-Bazel 5.0rc1 cannot link JDK 17 records with explicit declared constructors in a separate package.
+Bazel 5.0rc1 cannot link JDK 17 records with explicit declared constructors in a separate library.
 
 == Demonstration
 
@@ -22,7 +22,7 @@ It fails with
 
 [source]
 ----
-ERROR: [...]/bazel_jdk17/src/main/java/com/example/hello/BUILD:3:13: Compiling Java headers src/main/java/com/example/hello/libhello-hjar.jar (1 source file) failed: (Exit 1): java failed: error executing command external/remotejdk17_macos/bin/java [...]
+ERROR: [...]/bazel_jdk17/src/main/java/com/example/hello/BUILD:3:13: Compiling Java headers src/main/java/com/example/libhello-hjar.jar (1 source file) failed: (Exit 1): java failed: error executing command external/remotejdk17_macos/bin/java [...]
 
 src/main/java/com/example/hello/Hello.java:6: error: unexpected token: {
   public Hello {
@@ -31,11 +31,10 @@ src/main/java/com/example/hello/Hello.java:6: error: unexpected token: {
 
 == Analysis
 
-
 Interestingly enough,
 
 [source,shell]
-bazelisk build //src/main/java/com/example/hello
+bazelisk run //src/main/java/com/example:complete
 
 works, so the record can be compiled. What fails is the linking
 
@@ -47,4 +46,4 @@ On the other hand
 [source,shell]
 bazelisk run --nojava_header_compilation //src/main/java/com/example
 
-works, so it might be an issue with https://github.com/google/turbine[Turbine].
+works again, so it might be an issue with https://github.com/google/turbine[Turbine].

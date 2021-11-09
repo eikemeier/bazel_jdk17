@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.hello.Hello;
 import java.util.logging.Logger;
 
 public final class Main {
