@@ -1,0 +1,50 @@
+= Bazel JDK 17 Record Issue
+:Author:    Oliver Eikemeier
+:Email:     <eikemeier@fillmore-labs.com>
+:Date:      2021-11
+:Revision:  v0.1
+:toc: macro
+
+toc::[]
+
+== Abstract
+
+Bazel 5.0rc1 cannot link JDK 17 records with explicit declared constructors in a separate package.
+
+== Demonstration
+
+https://github.com/bazelbuild/bazelisk#installation[Install bazelisk], then run
+
+[source,shell]
+bazelisk run //src/main/java/com/example
+
+It fails with
+
+[source]
+----
+ERROR: [...]/bazel_jdk17/src/main/java/com/example/hello/BUILD:3:13: Compiling Java headers src/main/java/com/example/hello/libhello-hjar.jar (1 source file) failed: (Exit 1): java failed: error executing command external/remotejdk17_macos/bin/java [...]
+
+src/main/java/com/example/hello/Hello.java:6: error: unexpected token: {
+  public Hello {
+               ^
+----
+
+== Analysis
+
+
+Interestingly enough,
+
+[source,shell]
+bazelisk build //src/main/java/com/example/hello
+
+works, so the record can be compiled. What fails is the linking
+
+[source,shell]
+bazelisk build --verbose_failures --sandbox_debug //src/main/java/com/example
+
+On the other hand
+
+[source,shell]
+bazelisk run --nojava_header_compilation //src/main/java/com/example
+
+works, so it might be an issue with https://github.com/google/turbine[Turbine].
